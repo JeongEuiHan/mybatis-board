@@ -1,8 +1,8 @@
-package spboard.board.Domain.mybati;
+package spboard.board.Repository;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.security.core.parameters.P;
+import spboard.board.Domain.MapperDTO.CommentMeta;
 import spboard.board.Domain.entity.Comment;
 
 import java.time.LocalDateTime;
@@ -26,5 +26,7 @@ public interface CommentMapper {
 
     int deleteById(@Param("id") Long id);
     int deleteByLoginId(@Param("loginId") String loginId);
+
+    Optional<CommentMeta> findMetaById(Long commentId);
 
 }

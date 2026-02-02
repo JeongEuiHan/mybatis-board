@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="spboard.board.Domain.mybati.LikeMapper">
+<mapper namespace="spboard.board.Repository.LikeMapper">
     <resultMap id="LikeResultMap" type="spboard.board.Domain.entity.Like">
         <id property="id" column="id"/>
         <association property="user" javaType="spboard.board.Domain.entity.User">

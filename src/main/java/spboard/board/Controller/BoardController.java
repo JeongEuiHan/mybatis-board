@@ -125,34 +125,49 @@ public class BoardController {
 
     @PostMapping("/{category}/{boardId}/edit")
     public String boardEdit(@PathVariable String category, @PathVariable Long boardId,
-                            @ModelAttribute BoardDto dto, Model model) throws IOException {
-        Long editBoardId = boardService.editBoard(boardId, category, dto);
+                            @ModelAttribute BoardDto dto,
+                            Authentication auth, Model model) throws IOException {
+       try {
 
-        if (editBoardId == null) {
-            model.addAttribute("message", "해당 게시글이 존재하지 않습니다");
-            model.addAttribute("nextUrl", "/boards/" + category);
-        } else {
-            model.addAttribute("message", editBoardId + "번 글이 수정되었습니다.");
-            model.addAttribute("nextUrl", "/boards/" + category + "/" + boardId);
-        }
-        return "printMessage";
+           Long editBoardId = boardService.editBoard(boardId, category, dto, auth.getName());
+
+           if (editBoardId == null) {
+               model.addAttribute("message", "해당 게시글이 존재하지 않습니다");
+               model.addAttribute("nextUrl", "/boards/" + category);
+           } else {
+               model.addAttribute("message", editBoardId + "번 글이 수정되었습니다.");
+               model.addAttribute("nextUrl", "/boards/" + category + "/" + boardId);
+           }
+           return "printMessage";
+       } catch (org.springframework.security.access.AccessDeniedException e) {
+           model.addAttribute("message", "수정 권한이 없습니다.");
+           model.addAttribute("nextUrl", "/boards/" + category + "/" + boardId);
+           return "printMessage";
+       }
     }
 
     @GetMapping("/{category}/{boardId}/delete")
-    public String boardDelete(@PathVariable String category, @PathVariable Long boardId, Model model) throws IOException {
+    public String boardDelete(@PathVariable String category, @PathVariable Long boardId,
+                              Authentication auth, Model model) throws IOException {
         if (category.equals("greeting")) {
             model.addAttribute("message", "가입인사는 삭제할 수 없습니다.");
             model.addAttribute("nextUrl", "/boards/greeting");
             return "printMessage";
         }
 
-        Long deletedBoardId = boardService.deleteBoard(boardId, category);
+        try {
+            Long deletedBoardId = boardService.deleteBoard(boardId, category, auth.getName());
 
-        // id에 해당하는 게시글이 없거나 카테고리가 일치하지 않으면 에러 메시지 출력
-        // 게시글이 존재해 삭제했으면 삭제 완료 메시지 출력
-        model.addAttribute("message", deletedBoardId == null ? "해당 게시글이 존재하지 않습니다" : deletedBoardId + "번 글이 삭제되었습니다.");
-        model.addAttribute("nextUrl", "/boards/" + category);
-        return "printMessage";
+            model.addAttribute("message",
+                    deletedBoardId == null ? "해당 게시글이 존재하지 않습니다" : deletedBoardId + "번 글이 삭제되었습니다.");
+            model.addAttribute("nextUrl", "/boards/" + category);
+            return "printMessage";
+
+        } catch (org.springframework.security.access.AccessDeniedException e) {
+            model.addAttribute("message", "삭제 권한이 없습니다.");
+            model.addAttribute("nextUrl", "/boards/" + category + "/" + boardId);
+            return "printMessage";
+        }
     }
 
     @ResponseBody
@@ -164,6 +179,7 @@ public class BoardController {
     @GetMapping("/images/download/{boardId}")
     public ResponseEntity<UrlResource> downloadImage(@PathVariable Long boardId) throws MalformedURLException {
         return uploadImageService.downloadImage(boardId);
+
     }
 
 }

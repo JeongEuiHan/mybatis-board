@@ -8,7 +8,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import spboard.board.Domain.mybati.UserMapper;
+import spboard.board.Repository.UserMapper;
 import spboard.board.config.auth.MyAccessDeniedHandler;
 import spboard.board.config.auth.MyAuthenticationEntryPoint;
 import spboard.board.config.auth.MyLoginSuccessHandler;

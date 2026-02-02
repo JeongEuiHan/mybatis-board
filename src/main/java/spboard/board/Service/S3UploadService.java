@@ -17,8 +17,8 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import spboard.board.Domain.entity.Board;
 import spboard.board.Domain.entity.UploadImage;
-import spboard.board.Domain.mybati.BoardMapper;
-import spboard.board.Domain.mybati.UploadImageMapper;
+import spboard.board.Repository.BoardMapper;
+import spboard.board.Repository.UploadImageMapper;
 
 import java.io.IOException;
 import java.time.Duration;

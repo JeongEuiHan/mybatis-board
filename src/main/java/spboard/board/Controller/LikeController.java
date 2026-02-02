@@ -3,9 +3,8 @@ package spboard.board.Controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import spboard.board.Service.BoardService;
 import spboard.board.Service.LikeService;
 
@@ -17,14 +16,20 @@ public class LikeController {
     private final LikeService likeService;
     private final BoardService boardService;
 
-    @GetMapping("/add/{boardId}")
-    public String addLike(@PathVariable Long boardId, Authentication auth) {
+    @PostMapping("/add/{boardId}")
+    public String addLike(@PathVariable Long boardId,
+                          @RequestParam String category,
+                          Authentication auth,
+                          Model model) {
         likeService.addLike(auth.getName(), boardId);
         return "redirect:/boards/" + boardService.getCategory(boardId) + "/" + boardId;
     }
 
-    @GetMapping("/delete/{boardId}")
-    public String deleteLike(@PathVariable Long boardId, Authentication auth) {
+    @PostMapping("/delete/{boardId}")
+    public String deleteLike(@PathVariable Long boardId,
+                             @RequestParam String category,
+                             Authentication auth,
+                             Model model) {
         likeService.deleteLike(auth.getName(), boardId);
         return "redirect:/boards/" + boardService.getCategory(boardId) + "/" + boardId;
     }

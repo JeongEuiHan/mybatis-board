@@ -10,7 +10,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import spboard.board.Domain.entity.User;
 import spboard.board.Domain.enum_class.UserRole;
 import spboard.board.Domain.enum_class.UserStatus;
-import spboard.board.Domain.mybati.UserMapper;
+import spboard.board.Repository.UserMapper;
 
 import java.io.IOException;
 

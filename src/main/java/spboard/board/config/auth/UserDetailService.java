@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import spboard.board.Domain.entity.User;
 import spboard.board.Domain.enum_class.UserStatus;
-import spboard.board.Domain.mybati.UserMapper;
+import spboard.board.Repository.UserMapper;
 
 @Service
 @RequiredArgsConstructor

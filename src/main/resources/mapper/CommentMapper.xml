@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="spboard.board.Domain.mybati.CommentMapper">
+<mapper namespace="spboard.board.Repository.CommentMapper">
     <resultMap id="CommentResultMap" type="spboard.board.Domain.entity.Comment">
         <id property="id" column="id"/>
         <result property="body" column="body"/>
@@ -82,4 +82,14 @@
         WHERE login_id = #{loginId}
         )
     </delete>
+
+    <select id="findMetaById" resultType="spboard.board.Domain.MapperDTO.CommentMeta">
+        SELECT
+        id AS commentId,
+        user_id AS userId,
+        board_id AS boardId
+        FROM todo.`comment`
+        WHERE id = #{commentId}
+        LIMIT 1
+    </select>
 </mapper>

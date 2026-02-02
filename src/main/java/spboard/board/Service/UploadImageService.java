@@ -10,8 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriUtils;
 import spboard.board.Domain.entity.Board;
 import spboard.board.Domain.entity.UploadImage;
-import spboard.board.Domain.mybati.BoardMapper;
-import spboard.board.Domain.mybati.UploadImageMapper;
+import spboard.board.Repository.BoardMapper;
+import spboard.board.Repository.UploadImageMapper;
 
 import java.io.File;
 import java.io.IOException;

@@ -13,16 +13,13 @@ import spboard.board.Domain.MapperDTO.BoardDeleteMeta;
 import spboard.board.Domain.entity.*;
 import spboard.board.Domain.enum_class.BoardCategory;
 import spboard.board.Domain.enum_class.UserRole;
-import spboard.board.Domain.mybati.BoardMapper;
-import spboard.board.Domain.mybati.CommentMapper;
-import spboard.board.Domain.mybati.LikeMapper;
-import spboard.board.Domain.mybati.UserMapper;
+import spboard.board.Repository.BoardMapper;
+import spboard.board.Repository.UserMapper;
 import spboard.board.Domain.Dto.BoardCreateRequest;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,23 +107,20 @@ public class BoardService {
     }
 
     @Transactional
-    public Long editBoard(Long boardId, String category, BoardDto dto) throws IOException {
+    public Long editBoard(Long boardId, String category, BoardDto dto, String loginId) throws IOException {
+        BoardDeleteMeta meta = boardMapper.findDeleteMetaById(boardId).orElse(null);
+        if (meta == null || !meta.category().name().equalsIgnoreCase(category)) return null;
+
+        // ✅ 작성자 본인 or ADMIN만 허용
+        validateOwnerOrAdmin(meta.userId(), loginId);
+
         Board board = boardMapper.findById(boardId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
-        // id에 해당하는 게시글이 없거나 카테고리가 일치하지 않으면 null return
-        if(!board.getCategory().toString().equalsIgnoreCase(category)) {
-            return null;
-        }
-
-        // 1. 새로운 이미지 파일이 전송되었는지 확인
+        // 이미지 교체 로직(기존 그대로)
         if (dto.getNewImage() != null && !dto.getNewImage().isEmpty()) {
-
-            // 게시글에 이미지가 있었으면 삭제
             if (board.getUploadImage() != null) {
-
                 boardMapper.updateUploadImageId(boardId, null);
-
                 uploadImageService.deleteImage(board.getUploadImage());
             }
         }
@@ -137,29 +131,28 @@ public class BoardService {
         }
 
         boardMapper.updateContent(board.getId(), dto.getTitle(), dto.getBody(), LocalDateTime.now());
-
         return board.getId();
     }
 
     @Transactional
-    public Long deleteBoard(Long boardId, String category)  {
+    public Long deleteBoard(Long boardId, String category, String loginId)  {
 
         BoardCategory reqCategory = BoardCategory.of(category);
-        if(reqCategory == null) return null;
+        if (reqCategory == null) return null;
 
         BoardDeleteMeta meta = boardMapper.findDeleteMetaById(boardId).orElse(null);
+        if (meta == null || meta.category() != reqCategory) return null;
 
-        if (meta == null || meta.category() != reqCategory){
-            return null;
-        }
+        // ✅ 작성자 본인 or ADMIN만 허용
+        validateOwnerOrAdmin(meta.userId(), loginId);
 
         if (meta.uploadImageId() != null) {
             boardMapper.updateUploadImageId(boardId, null);
         }
 
         userMapper.decreaseReceivedLikeCnt(meta.userId(), meta.likeCnt());
-
         boardMapper.deleteById(boardId);
+
         return boardId;
     }
 
@@ -195,5 +188,16 @@ public class BoardService {
         return boardMapper.getLikeCount(boardId);
     }
 
+    private void validateOwnerOrAdmin(Long ownerUserId, String loginId) {
+        User loginUser = userMapper.findByLoginId(loginId)
+                .orElseThrow(() -> new IllegalArgumentException("user not found"));
+
+        boolean isOwner = loginUser.getId().equals(ownerUserId);
+        boolean isAdmin = loginUser.getUserRole() == UserRole.ADMIN;
+
+        if (!isOwner && !isAdmin) {
+            throw new org.springframework.security.access.AccessDeniedException("not owner");
+        }
+    }
 
 }

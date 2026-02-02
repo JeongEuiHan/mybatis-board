@@ -1,15 +1,13 @@
 package spboard.board.Service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.objenesis.ObjenesisException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import spboard.board.Domain.entity.Board;
-import spboard.board.Domain.entity.Like;
 import spboard.board.Domain.entity.User;
-import spboard.board.Domain.mybati.BoardMapper;
-import spboard.board.Domain.mybati.LikeMapper;
-import spboard.board.Domain.mybati.UserMapper;
+import spboard.board.Repository.BoardMapper;
+import spboard.board.Repository.LikeMapper;
+import spboard.board.Repository.UserMapper;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +27,7 @@ public class LikeService {
 
         // 자신이 누른 좋아요가 아니라면
         if (!boardUser.getId().equals(loginUser.getId())) {
-            userMapper.incrementReceivedLikeCount(loginUser.getId());
+            userMapper.incrementReceivedLikeCount(boardUser.getId());
         }
 
         boardMapper.incrementLikeCount(boardId);
@@ -48,7 +46,7 @@ public class LikeService {
 
         // 자신이 누른 좋아요가 아니라면
         if(!boardUser.getId().equals(loginUser.getId())) {
-            userMapper.decrementReceivedLikeCount(loginUser.getId());
+            userMapper.decrementReceivedLikeCount(boardUser.getId());
         }
 
         boardMapper.decrementLikeCount(boardId);
@@ -74,7 +72,7 @@ public class LikeService {
             likeMapper.deleteByUserLoginIdAndBoardId(loginId, boardId);
             boardMapper.updateLikeCount(boardId, -1); // 좋아요 수 감소
             if(!boardUser.getId().equals(loginUser.getId())) {
-                userMapper.decrementReceivedLikeCount(loginUser.getId());
+                userMapper.decrementReceivedLikeCount(boardUser.getId());
             }
             return false; // 이제 좋아요가 아님
         } else {
@@ -82,7 +80,7 @@ public class LikeService {
             likeMapper.insert(loginUser.getId(), boardId);
             boardMapper.updateLikeCount(boardId, 1); // 좋아요 수 증가
             if (!boardUser.getId().equals(loginUser.getId())) {
-                userMapper.incrementReceivedLikeCount(loginUser.getId());
+                userMapper.incrementReceivedLikeCount(boardUser.getId());
             }
             return true; // 이제 좋아요 상태임
         }

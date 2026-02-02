@@ -30,17 +30,43 @@ public class CommentController {
     @PostMapping("/{commentId}/edit")
     public String editComment(@PathVariable Long commentId, @ModelAttribute CommentCreateRequest request,
                             Authentication auth, Model model) {
-        Long boardId = commentService.editComment(commentId, request.getBody(), auth.getName());
-        model.addAttribute("message", boardId == null? "잘못된 요청입니다." : "댓글이 수정 되었습니다.");
-        model.addAttribute("nextUrl", "/boards/" + boardService.getCategory(boardId) + "/" + boardId);
-        return "printMessage";
+        try {
+            Long boardId = commentService.editComment(commentId, request.getBody(), auth.getName());
+
+            if (boardId == null) {
+                model.addAttribute("message", "댓글이 존재하지 않습니다.");
+                model.addAttribute("nextUrl", "/boards");
+            } else {
+                model.addAttribute("message", "댓글이 수정되었습니다.");
+                model.addAttribute("nextUrl", "/boards/" + boardService.getCategory(boardId) + "/" + boardId);
+            }
+            return "printMessage";
+
+        } catch (org.springframework.security.access.AccessDeniedException e) {
+            model.addAttribute("message", "댓글 수정 권한이 없습니다.");
+            model.addAttribute("nextUrl", "/boards");
+            return "printMessage";
+        }
     }
 
     @GetMapping("/{commentId}/delete")
     public String deleteComment(@PathVariable Long commentId, Authentication auth, Model model) {
-        Long boardId = commentService.deleteComment(commentId, auth.getName());
-        model.addAttribute("message", boardId == null? "잘못된 요청입니다." : "댓글이 수정 되었습니다.");
-        model.addAttribute("nextUrl", "/boards/" + boardService.getCategory(boardId) + "/" + boardId);
-        return "printMessage";
+        try {
+            Long boardId = commentService.deleteComment(commentId, auth.getName());
+
+            if (boardId == null) {
+                model.addAttribute("message", "댓글이 존재하지 않습니다.");
+                model.addAttribute("nextUrl", "/boards");
+            } else {
+                model.addAttribute("message", "댓글이 삭제되었습니다.");
+                model.addAttribute("nextUrl", "/boards/" + boardService.getCategory(boardId) + "/" + boardId);
+            }
+            return "printMessage";
+
+        } catch (org.springframework.security.access.AccessDeniedException e) {
+            model.addAttribute("message", "댓글 삭제 권한이 없습니다.");
+            model.addAttribute("nextUrl", "/boards");
+            return "printMessage";
+        }
     }
 }

@@ -1,4 +1,4 @@
-package spboard.board.Domain.mybati;
+package spboard.board.Repository;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

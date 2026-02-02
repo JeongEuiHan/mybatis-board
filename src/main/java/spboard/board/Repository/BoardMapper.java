@@ -1,8 +1,7 @@
-package spboard.board.Domain.mybati;
+package spboard.board.Repository;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.security.core.parameters.P;
 import spboard.board.Domain.MapperDTO.BoardDeleteMeta;
 import spboard.board.Domain.entity.Board;
 import spboard.board.Domain.enum_class.BoardCategory;
